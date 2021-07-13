@@ -12,14 +12,12 @@ import open3d as o3d
 print("Number of arguments:", len(sys.argv), "arguments.")
 print("Argument List:", str(sys.argv))
 save_path = "./dataset"
-mc_ip_address = "224.0.0.1"
-#local_ip_address = "192.168.0.1"
-local_ip_address = "localhost"
 port = 1024
 chunk_size = 4096
 
 
 def main(argv):
+    mc_ip_address = argv[0] if len(argv) else "224.0.0.1"
     multi_cast_message(mc_ip_address, port, "EtherSensePing")
 
 
@@ -61,9 +59,11 @@ class ImageClient(asyncore.dispatcher):
         color_image = o3d.geometry.Image(cv2.cvtColor(color_data, cv2.COLOR_BGR2RGB))
         depth_image = o3d.geometry.Image(depth_data)
 
-        o3d.io.write_image(f"{save_path}/color/{timestamp}.jpg", color_image)
-        o3d.io.write_image(f"{save_path}/depth/{timestamp}.png", depth_image)
-        print("save color and depth image")
+        if self.frame_id > 12:
+            # need time for autofocusing on the environment
+            o3d.io.write_image(f"{save_path}/color/{timestamp}.jpg", color_image)
+            o3d.io.write_image(f"{save_path}/depth/{timestamp}.png", depth_image)
+            print("save color and depth image")
 
         # for saving pcd
         #rgbd = o3d.geometry.RGBDImage.create_from_color_and_depth(color_image, depth_image, convert_rgb_to_intensity=False, depth_scale=200, depth_trunc=200)
