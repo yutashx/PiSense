@@ -11,7 +11,7 @@ import open3d as o3d
 
 print("Number of arguments:", len(sys.argv), "arguments.")
 print("Argument List:", str(sys.argv))
-pcd_save_path = "./savedata/"
+save_path = "./dataset"
 mc_ip_address = "224.0.0.1"
 #local_ip_address = "192.168.0.1"
 local_ip_address = "localhost"
@@ -60,29 +60,25 @@ class ImageClient(asyncore.dispatcher):
 
         color_image = o3d.geometry.Image(cv2.cvtColor(color_data, cv2.COLOR_BGR2RGB))
         depth_image = o3d.geometry.Image(depth_data)
-        rgbd = o3d.geometry.RGBDImage.create_from_color_and_depth(color_image, depth_image, convert_rgb_to_intensity=False, depth_scale=200, depth_trunc=200)
-        intr = [int(intr[0]), int(intr[1]), *intr[2:]]
-        pcd = o3d.geometry.PointCloud.create_from_rgbd_image(rgbd, o3d.camera.PinholeCameraIntrinsic(*intr))
-        rotation = np.array([[1,0,0], [0,-1,0], [0,0,-1]])
-        pcd.rotate(rotation)
-        o3d.io.write_point_cloud(pcd_save_path + f"{timestamp}.pcd", pcd)
-        print(f"save {timestamp}.pcd")
 
-        #depth_doubled = cv2.resize(depth_data, (0,0), fx=2, fy=2, interpolation=cv2.INTER_NEAREST) # depth image scale is doubled
+        o3d.io.write_image(f"{save_path}/color/{timestamp}.jpg", color_image)
+        o3d.io.write_image(f"{save_path}/depth/{timestamp}.png", depth_image)
+        print("save color and depth image")
+
+        # for saving pcd
+        #rgbd = o3d.geometry.RGBDImage.create_from_color_and_depth(color_image, depth_image, convert_rgb_to_intensity=False, depth_scale=200, depth_trunc=200)
+        #intr = [int(intr[0]), int(intr[1]), *intr[2:]]
+        #pcd = o3d.geometry.PointCloud.create_from_rgbd_image(rgbd, o3d.camera.PinholeCameraIntrinsic(*intr))
+        #rotation = np.array([[1,0,0], [0,-1,0], [0,0,-1]])
+        #pcd.rotate(rotation)
+        #o3d.io.write_point_cloud(save_path + f"{timestamp}.pcd", pcd)
+        #print(f"save {timestamp}.pcd")
+
         depth_colormap = cv2.applyColorMap(cv2.convertScaleAbs(depth_data, alpha=0.03), cv2.COLORMAP_JET)
         cv2.putText(color_data, timestamp, (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (65536), 2, cv2.LINE_AA)
         images = np.concatenate((color_data, depth_colormap), axis=1)
         cv2.imshow("window"+str(self.windowName), images)
         cv2.waitKey(1)
-
-        """
-        cv2.imwrite(pcd_save_path + f"color_{timestamp}.png", color_data)
-        cv2.imwrite(pcd_save_path + f"depth_{timestamp}.png", depth_data)
-        self.vis.clear_geometries()
-        self.vis.add_geometry(pcd)
-        self.vis.poll_events()
-        self.vis.update_renderer()
-        """
 
         self.buffer = bytearray()
         self.frame_id += 1
