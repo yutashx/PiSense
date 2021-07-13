@@ -16,7 +16,7 @@ port = 1024
 chunk_size = 4096
 clipping_distance_in_meters = 2.0
 camera_width = 640
-camera_height = 360
+camera_height = 480
 camera_fps = 6
 #rs.log_to_console(rs.log_severity.debug)
 
