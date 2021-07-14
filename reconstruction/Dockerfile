@@ -1,7 +1,7 @@
 FROM nvidia/cuda:11.4.0-base-ubuntu20.04
 
-RUN apt update && apt upgrade -y
-RUN apt install --no-install-recommends -y \
+RUN apt-get update && apt-get upgrade -y
+RUN apt-get install --no-install-recommends -y \
     neovim \
     python3.8 \
     python3-pip \
