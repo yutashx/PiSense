@@ -5,6 +5,6 @@ dataset
 librealsense2.so
 pyrealsense2.cpython-37m-arm-linux-gnueabihf.so
 __pycache__
-__pycache__/*
+__pycache__/
 tmp
 *.pyc
