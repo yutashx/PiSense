@@ -4,15 +4,18 @@
 
 # examples/python/pipelines/color_map_optimization_for_reconstruction_system.py
 
+
 import argparse
 import os
 import sys
 import json
-from trajectory_io import *
 import open3d as o3d
 
-sys.path.append('../reconstruction_system')
-sys.path.append("../utility")
+sys.path.append('./reconstruction_system')
+sys.path.append("./utility")
+sys.path.append("./geometry")
+print(sys.path)
+from trajectory_io import *
 from initialize_config import *
 from file import *
 
