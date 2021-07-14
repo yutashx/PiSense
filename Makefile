@@ -1,14 +1,14 @@
-CONFIG_PATH=./reconstruction_system/config/realsense.json
+CONFIG_PATH=./reconstruction/reconstruction_system/config/realsense.json
 ADDRESS=224.0.0.1
-REFERED_DIRECTORY_PATH=./reconstruction_system/dataset
-SAVE_DATASET_PATH=./reconstruction_system/save_dataset
+REFERED_DIRECTORY_PATH=./reconstruction/reconstruction_system/dataset
+SAVE_DATASET_PATH=./reconstruction/reconstruction_system/save_dataset
 
 record:
-	python3 ./reconstruction_system/scripts/record.py
+	python3 ./reconstruction/reconstruction_system/scripts/record.py
 
 run_pipeline:
-	python3 ./reconstruction_system/run_system.py --make --register --refine --integrate ${CONFIG_PATH}
-	python ./pipelines/color_map_optimization_for_reconstruction_system.py  --config ${CONFIG_PATH}
+	python3 ./reconstruction/reconstruction_system/run_system.py --make --register --refine --integrate ${CONFIG_PATH}
+	python ./reconstruction/pipelines/color_map_optimization_for_reconstruction_system.py  --config ${CONFIG_PATH}
 
 run_client:
 	python3 ./realsense_client/EtherSenseClient.py ${ADDRESS}
