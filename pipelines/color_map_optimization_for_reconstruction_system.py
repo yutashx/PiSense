@@ -113,7 +113,7 @@ def main(config, keys):
     mesh_optimized = o3d.pipelines.color_map.run_rigid_optimizer(
         mesh, rgbd_images, camera,
         o3d.pipelines.color_map.RigidOptimizerOption(maximum_iteration=0))
-    o3d.visualization.draw_geometries([mesh_optimized])
+    #o3d.visualization.draw_geometries([mesh_optimized])
     o3d.io.write_triangle_mesh(
         os.path.join(path, config["folder_scene"],
                      "color_map_before_optimization.ply"), mesh_optimized)
@@ -127,7 +127,7 @@ def main(config, keys):
         mesh, rgbd_images, camera,
         o3d.pipelines.color_map.NonRigidOptimizerOption(
             maximum_iteration=300, maximum_allowable_depth=config["max_depth"]))
-    o3d.visualization.draw_geometries([mesh_optimized])
+    #o3d.visualization.draw_geometries([mesh_optimized])
     o3d.io.write_triangle_mesh(
         os.path.join(path, config["folder_scene"],
                      "color_map_after_optimization.ply"), mesh_optimized)
@@ -169,3 +169,4 @@ if __name__ == "__main__":
         keys = [i for i in range(0, len(traj.parameters), args.sample_rate)]
 
     main(config, keys)
+    print("Done")
