@@ -11,10 +11,9 @@ import sys
 import json
 import open3d as o3d
 
-sys.path.append('./reconstruction_system')
-sys.path.append("./utility")
-sys.path.append("./geometry")
-print(sys.path)
+sys.path.append('./reconstruction/reconstruction_system')
+sys.path.append("./reconstruction/utility")
+sys.path.append("./reconstruction/geometry")
 from trajectory_io import *
 from initialize_config import *
 from file import *

@@ -1,6 +1,6 @@
 {
     "name": "reconstruction using data captured by EtherSenseClient",
-    "path_dataset": "./reconstruction_system/dataset/",
+    "path_dataset": "./reconstruction/reconstruction_system/dataset/",
     "path_intrinsic": "",
     "max_depth": 3.0,
     "voxel_size": 0.05,

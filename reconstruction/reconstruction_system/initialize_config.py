@@ -6,7 +6,7 @@
 
 import os
 import sys
-sys.path.append("./utility")
+sys.path.append("./reconstruction/utility")
 from file import check_folder_structure, extract_rgbd_frames
 
 
