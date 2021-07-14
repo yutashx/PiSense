@@ -9,11 +9,9 @@ build_reconstruction:
 	docker build -f ./reconstruction/Dockerfile -t ${TAG} ./reconstruction/
 
 run_reconstruction:
-	docker run -it --rm --name ${USER}_pisense_reconstruction --gpus all -v ${CURRENT_PATH}:/root/ ${TAG} bash
-
-run_pipeline:
-	python3 ./reconstruction/reconstruction_system/run_system.py --make --register --refine --integrate ${CONFIG_PATH}
-	python ./reconstruction/pipelines/color_map_optimization_for_reconstruction_system.py  --config ${CONFIG_PATH}
+	docker run -it --rm --name ${USER}_pisense_reconstruction --gpus all -v ${CURRENT_PATH}:/root/ ${TAG} bash -c \
+	'python3 ./reconstruction/reconstruction_system/run_system.py --make --register --refine --integrate ${CONFIG_PATH}; \
+	python3 ./reconstruction/pipelines/color_map_optimization_for_reconstruction_system.py  --config ${CONFIG_PATH};'
 
 run_client:
 	python3 ./realsense_client/EtherSenseClient.py ${ADDRESS}

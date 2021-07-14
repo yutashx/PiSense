@@ -1,5 +1,7 @@
 FROM nvidia/cuda:11.4.0-base-ubuntu20.04
 
+MAINTAINER yutashx
+
 RUN apt-get update && apt-get upgrade -y
 RUN apt-get install --no-install-recommends -y \
     make \
@@ -13,5 +15,11 @@ RUN apt-get install --no-install-recommends -y \
 
 COPY requirements.txt /tmp
 RUN pip install -r /tmp/requirements.txt
+
+ARG UID=1000
+RUN useradd -m -u ${UID} docker
+USER ${UID}
+
+WORKDIR /root
 
 CMD ["/bin/bash"]
