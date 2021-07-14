@@ -4,5 +4,7 @@ dataset
 *.jpg
 librealsense2.so
 pyrealsense2.cpython-37m-arm-linux-gnueabihf.so
-__pycahce__
+__pycache__
+__pycache__/*
 tmp
+*.pyc
