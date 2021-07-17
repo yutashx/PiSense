@@ -7,18 +7,20 @@ import socket
 import struct
 import cv2
 import open3d as o3d
+from argparser import ArgumentParser
 
 
-print("Number of arguments:", len(sys.argv), "arguments.")
-print("Argument List:", str(sys.argv))
+print("running client")
 save_path = "./dataset"
 port = 1024
 chunk_size = 4096
+isWindowOpen = True
+mc_ip_address = "224.0.0.1"
+mc_message = "PiSensePing"
 
 
 def main(argv):
-    mc_ip_address = argv[0] if len(argv) else "224.0.0.1"
-    multi_cast_message(mc_ip_address, port, "EtherSensePing")
+    multi_cast_message(mc_ip_address, port, mc_message)
 
 
 #UDP client for each camera server
@@ -30,7 +32,8 @@ class ImageClient(asyncore.dispatcher):
         self.buffer = bytearray()
         self.windowName = self.port
         # open cv window which is unique to the port 
-        cv2.namedWindow("window"+str(self.windowName))
+        if isWindowOpen:
+            cv2.namedWindow("window"+str(self.windowName))
         #self.vis = o3d.visualization.Visualizer()
         self.remainingBytes = 0
         self.frame_id = 0
@@ -58,6 +61,7 @@ class ImageClient(asyncore.dispatcher):
 
         color_image = o3d.geometry.Image(cv2.cvtColor(color_data, cv2.COLOR_BGR2RGB))
         depth_image = o3d.geometry.Image(depth_data)
+        depth_colormap = cv2.applyColorMap(cv2.convertScaleAbs(depth_data, alpha=0.03), cv2.COLORMAP_JET)
 
         if self.frame_id > 12:
             # need time for autofocusing on the environment
@@ -65,20 +69,11 @@ class ImageClient(asyncore.dispatcher):
             o3d.io.write_image(f"{save_path}/depth/{timestamp}.png", depth_image)
             print("save color and depth image")
 
-        # for saving pcd
-        #rgbd = o3d.geometry.RGBDImage.create_from_color_and_depth(color_image, depth_image, convert_rgb_to_intensity=False, depth_scale=200, depth_trunc=200)
-        #intr = [int(intr[0]), int(intr[1]), *intr[2:]]
-        #pcd = o3d.geometry.PointCloud.create_from_rgbd_image(rgbd, o3d.camera.PinholeCameraIntrinsic(*intr))
-        #rotation = np.array([[1,0,0], [0,-1,0], [0,0,-1]])
-        #pcd.rotate(rotation)
-        #o3d.io.write_point_cloud(save_path + f"{timestamp}.pcd", pcd)
-        #print(f"save {timestamp}.pcd")
-
-        depth_colormap = cv2.applyColorMap(cv2.convertScaleAbs(depth_data, alpha=0.03), cv2.COLORMAP_JET)
-        cv2.putText(color_data, timestamp, (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (65536), 2, cv2.LINE_AA)
-        images = np.concatenate((color_data, depth_colormap), axis=1)
-        cv2.imshow("window"+str(self.windowName), images)
-        cv2.waitKey(1)
+        if isWindowOpen:
+            cv2.putText(color_data, timestamp, (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (65536), 2, cv2.LINE_AA)
+            images = np.concatenate((color_data, depth_colormap), axis=1)
+            cv2.imshow("window"+str(self.windowName), images)
+            cv2.waitKey(1)
 
         self.buffer = bytearray()
         self.frame_id += 1
@@ -138,5 +133,24 @@ def multi_cast_message(ip_address, port, message):
         print(sys.stderr, "closing socket")
         sock.close()
 
+def get_option():
+    argparser = ArgumentParser()
+    argparser.add_argument('--save_path', type=str, default="./dataset", help="input data save path")
+    argparser.add_argument('--port', type=int, default=1024, help="input port number")
+    argparser.add_argument('--address', type=str, default="224.0.0.1", help="input destination address")
+    argparser.add_argument('--chunk_size', type=int, default=4096, help="input chunk size")
+    argparser.add_argument('--window', type=bool, default=True, help="open realtime streaming window")
+    argparser.add_argument('--message', type=str, default="PiSensePing", help="input message for multicast ping")
+
+    return argparser.parse_args()
+
 if __name__ == "__main__":
-    main(sys.argv[1:])
+    args = get_option()
+    save_path = args.save_path
+    port = args.port
+    mc_ip_address = args.address
+    chunk_size = args.chunk_size
+    isWindowOpen = args.window
+    mc_message = args.message
+
+    main()

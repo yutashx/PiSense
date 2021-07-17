@@ -6,19 +6,15 @@ import numpy as np
 import pickle
 import socket
 import struct
+from argparser import ArgumentParser
 
 
-print('Number of arguments:', len(sys.argv), 'arguments.')
-print('Argument List:', str(sys.argv))
-#mc_ip_address = '224.0.0.1'
-mc_ip_address = 'localhost'
 port = 1024
 chunk_size = 4096
 clipping_distance_in_meters = 2.0
 camera_width = 640
 camera_height = 480
 camera_fps = 6
-#rs.log_to_console(rs.log_severity.debug)
 
 
 def getColorDepthTimestamp(pipeline, color_depth_filter, align, depth_sensor):
@@ -127,7 +123,7 @@ class EtherSenseServer(asyncore.dispatcher):
 
 
 class MulticastServer(asyncore.dispatcher):
-    def __init__(self, host = mc_ip_address, port=1024):
+    def __init__(self, port=1024):
         asyncore.dispatcher.__init__(self)
         server_address = ('', port)
         self.create_socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -151,13 +147,34 @@ class MulticastServer(asyncore.dispatcher):
         channel, addr = self.accept()
         print('received %s bytes from %s' % (data, addr))
 
+def get_option():
+    argparser = ArgumentParser()
+    argparser.add_argument('--port', type=int, default=1024, help="input port number")
+    argparser.add_argument('--chunk_size', type=int, default=4096, help="input chunk size")
+    argparser.add_argument('--width', type=int, default=640, help="input camera width")
+    argparser.add_argument('--height', type=int, default=480, help="input camera height")
+    argparser.add_argument('--fps', type=int, default=6, help="input camera fps")
+    argparser.add_argument('--distance', type=float, default=2.0, help="input clipping distance in meters")
+    argparser.add_argument('--log', type=bool, default=False, help="show log")
 
-def main(argv):
+    return argparser.parse_args()
+
+def main():
     # initalise the multicast receiver 
-    server = MulticastServer()
+    server = MulticastServer(port)
     # hand over excicution flow to asyncore
     asyncore.loop()
 
 if __name__ == '__main__':
-    main(sys.argv[1:])
+    args = get_option()
+    port = args.port
+    chunk_size = args.chunk_size
+    camera_width = args.width
+    camera_height = args.height
+    camera_fps = args.fps
+    clipping_distance_in_meters = args.distance
+    if args.log:
+        rs.log_to_console(rs.log_severity.debug)
+
+    main()
 
