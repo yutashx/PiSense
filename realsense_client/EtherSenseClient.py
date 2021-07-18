@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#i!/usr/bin/python
 import sys, getopt
 import asyncore
 import numpy as np
@@ -7,10 +7,9 @@ import socket
 import struct
 import cv2
 import open3d as o3d
-from argparser import ArgumentParser
+from argparse import ArgumentParser
 
 
-print("running client")
 save_path = "./dataset"
 port = 1024
 chunk_size = 4096
@@ -19,7 +18,7 @@ mc_ip_address = "224.0.0.1"
 mc_message = "PiSensePing"
 
 
-def main(argv):
+def main():
     multi_cast_message(mc_ip_address, port, mc_message)
 
 
@@ -67,7 +66,7 @@ class ImageClient(asyncore.dispatcher):
             # need time for autofocusing on the environment
             o3d.io.write_image(f"{save_path}/color/{timestamp}.jpg", color_image)
             o3d.io.write_image(f"{save_path}/depth/{timestamp}.png", depth_image)
-            print("save color and depth image")
+            print(f"save color and depth image at {timestamp}")
 
         if isWindowOpen:
             cv2.putText(color_data, timestamp, (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (65536), 2, cv2.LINE_AA)
@@ -76,6 +75,7 @@ class ImageClient(asyncore.dispatcher):
             cv2.waitKey(1)
 
         self.buffer = bytearray()
+        print(f"fram_id {self.frame_id}")
         self.frame_id += 1
 
     def readable(self):
@@ -139,12 +139,13 @@ def get_option():
     argparser.add_argument('--port', type=int, default=1024, help="input port number")
     argparser.add_argument('--address', type=str, default="224.0.0.1", help="input destination address")
     argparser.add_argument('--chunk_size', type=int, default=4096, help="input chunk size")
-    argparser.add_argument('--window', type=bool, default=True, help="open realtime streaming window")
+    argparser.add_argument('--window', action="store_true", help="open realtime streaming window")
     argparser.add_argument('--message', type=str, default="PiSensePing", help="input message for multicast ping")
 
     return argparser.parse_args()
 
 if __name__ == "__main__":
+    print("running client")
     args = get_option()
     save_path = args.save_path
     port = args.port

@@ -6,7 +6,7 @@ import numpy as np
 import pickle
 import socket
 import struct
-from argparser import ArgumentParser
+from argparse import ArgumentParser
 
 
 port = 1024
@@ -166,6 +166,7 @@ def main():
     asyncore.loop()
 
 if __name__ == '__main__':
+    print("running server")
     args = get_option()
     port = args.port
     chunk_size = args.chunk_size

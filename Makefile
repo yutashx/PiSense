@@ -7,6 +7,7 @@ TAG_RECONSTRUCTION=pisense_reconstruction
 TAG_SERVER=pisense_server
 TAG_CLIENT=pisense_client
 PORT=1024
+WINDOW=False
 
 build_reconstruction:
 	docker build -f ./reconstruction/Dockerfile -t ${TAG_RECONSTRUCTION} ./reconstruction/
@@ -23,13 +24,14 @@ run_reconstruction:
 	python3 ./reconstruction/pipelines/color_map_optimization_for_reconstruction_system.py  --config ${CONFIG_PATH};'
 
 run_server:
-	$(eval DEVICELIST := $(shell v4l2-ctl --list-devices | awk 'BEGIN {FS="\n"; RS=""}  /RealSense/{print $0}' | tail +2 | sed 's/\t//g' | xargs -I{} echo "--device {}:{} "))
-	docker run -it --rm --name ${USER}_pisense_server -v ${CURRENT_PATH}:/root/ ${DEVICELIST} -p ${PORT}:${PORT}/udp ${TAG_SERVER} bash -c \
-	'python3 ./realsense_server/EtherSenseServer.py;'
+	#$(eval DEVICELIST := $(shell v4l2-ctl --list-devices | awk 'BEGIN {FS="\n"; RS=""}  /RealSense/{print $0}' | tail +2 | sed 's/\t//g' | xargs -I{} echo "--device {}:{} "))
+	#docker run -it --rm --name ${USER}_pisense_server -v ${CURRENT_PATH}:/root/ ${DEVICELIST} -p ${PORT}:${PORT}/udp ${TAG_SERVER} bash -c \
+	#'python3 ./realsense_server/EtherSenseServer.py;'
+	python3 ./realsense_server/EtherSenseServer.py
 
 run_client:
 	docker run -it --rm --name ${USER}_pisense_client -v ${CURRENT_PATH}:/root/ -p ${PORT}:${PORT}/udp ${TAG_CLIENT} bash -c \
-	'python3 ./realsense_client/EtherSenseClient.py ${ADDRESS}'
+	'python3 ./realsense_client/EtherSenseClient.py --address=${ADDRESS}'
 
 mv_dataset:
 	date "+%s" -r ${REFERED_DIRECTORY_PATH}
