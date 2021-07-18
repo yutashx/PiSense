@@ -30,8 +30,8 @@ run_server:
 	python3 ./realsense_server/EtherSenseServer.py
 
 run_client:
-	docker run -it --rm --name ${USER}_pisense_client -v ${CURRENT_PATH}:/root/ -p ${PORT}:${PORT}/udp ${TAG_CLIENT} bash -c \
-	'python3 ./realsense_client/EtherSenseClient.py --address=${ADDRESS}'
+	docker run -it --rm --name ${USER}_pisense_client -v ${CURRENT_PATH}:/root/ --net=host ${TAG_CLIENT} bash -c \
+	'python3 ./realsense_client/EtherSenseClient.py --address=${ADDRESS} --port=${PORT}'
 
 mv_dataset:
 	date "+%s" -r ${REFERED_DIRECTORY_PATH}
