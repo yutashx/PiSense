@@ -33,6 +33,9 @@ run_client:
 	docker run -it --rm --name ${USER}_pisense_client -v ${CURRENT_PATH}:/root/ --net=host ${TAG_CLIENT} bash -c \
 	'python3 ./realsense_client/EtherSenseClient.py --address=${ADDRESS} --port=${PORT}'
 
+install_server:
+	pip -r ./realsense_server/requirements.txt
+
 mv_dataset:
 	date "+%s" -r ${REFERED_DIRECTORY_PATH}
 	$(eval DIRECTORY_NAME := $(shell date "+%s" -r ${REFERED_DIRECTORY_PATH}))
