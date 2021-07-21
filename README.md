@@ -13,3 +13,6 @@ This reposiotry is based on [EtherSense](https://github.com/yutashx/EtherSense) 
 ## Tips
 `./realsense_server/archive.zip` is binary file of librealsense and pyrealsense2 built for Raspberry Pi.
 If you unzip the file and install some other packages with `requirements.txt`, you can run the realsense_server now.
+
+## License
+MIT
