@@ -64,6 +64,4 @@ mkdir_dataset:
 	mkdir -p ${REFERED_DIRECTORY_PATH}/color ${REFERED_DIRECTORY_PATH}/depth
 	mkdir -p ${SAVE_DATASET_PATH}
 
-init_directories:
-	mv_dataset
-	mkdir_dataset
+init_directories: mv_dataset mkdir_dataset
