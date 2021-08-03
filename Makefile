@@ -39,9 +39,6 @@ else
 endif
 
 run_server:
-	#$(eval DEVICELIST := $(shell v4l2-ctl --list-devices | awk 'BEGIN {FS="\n"; RS=""}  /RealSense/{print $0}' | tail +2 | sed 's/\t//g' | xargs -I{} echo "--device {}:{} "))
-	#docker run -it --rm --name ${USER}_pisense_server -v ${CURRENT_PATH}:/root/ ${DEVICELIST} -p ${PORT}:${PORT}/udp ${TAG_SERVER} bash -c \
-	#'python3 ./realsense_server/EtherSenseServer.py;'
 	python3 ./realsense_server/EtherSenseServer.py --port=${PORT} --chunk_size=${CHUNK_SIZE} --width=${WIDTH} --height=${HEIGHT} --fps=${FPS} --distance=${DISTANCE}
 
 run_client:
@@ -51,6 +48,16 @@ else
 	docker run -it --rm --name ${USER}_pisense_client -v ${CURRENT_PATH}:/root/ -v /etc/group:/etc/group:ro -v /etc/passwd:/etc/passwd:ro -u $(id -u $USER):$(id -g $USER) --net=host ${TAG_CLIENT} bash -c \
 	'python3 ./realsense_client/EtherSenseClient.py --save_path=${REFERED_DIRECTORY_PATH} --address=${ADDRESS} --port=${PORT} --chunk_size=${CHUNK_SIZE} --message=${MESSAGE}'
 endif
+
+run_capture:
+	capture_type=imgs
+	fps=30
+	height=1280
+	width=720
+	distance=3
+	python3 ./reconstruction/reconstruction_system/sensors/realsense_recorder.py --output_folder=${REFERED_DIRECTORY_PATH} --record_${capture_type} --fps=${fps} --color_width=${width} --color_height=${height} --depth_width=${width} --color_height=${height} --distance=${distance}
+	#python3 ./reconstruction/reconstruction_system/sensors/realsense_recorder.py --output_folder=${REFERED_DIRECTORY_PATH} --record_${capture_type}
+
 
 install_server:
 	pip -r ./realsense_server/requirements.txt
@@ -70,8 +77,8 @@ init_directories: mv_dataset mkdir_dataset
 make_video:
 ifeq ($(VIDEO_TYPE), color)
 	ffmpeg  -pattern_type glob -i '${REFERED_DIRECTORY_PATH}/color/*.jpg' '${REFERED_DIRECTORY_PATH}/color.mp4'
-else ifeq($(VIDEO_TYPE), depth)
+endif
+
+ifeq ($(VIDEO_TYPE), depth)
 	ffmpeg  -pattern_type glob -i '${REFERED_DIRECTORY_PATH}/depth/*.png' '${REFERED_DIRECTORY_PATH}/depth.mp4'
-else
-	echo "Nothing happend"
 endif

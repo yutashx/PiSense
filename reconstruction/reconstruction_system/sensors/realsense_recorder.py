@@ -9,12 +9,12 @@
 import pyrealsense2 as rs
 import numpy as np
 import cv2
-import argparse
 from os import makedirs
 from os.path import exists, join
 import shutil
 import json
 from enum import IntEnum
+from argparse import ArgumentParser
 
 try:
     # Python 2 compatible
@@ -61,28 +61,29 @@ def save_intrinsic_as_json(filename, frame):
             outfile,
             indent=4)
 
-
-if __name__ == "__main__":
-
-    parser = argparse.ArgumentParser(
+def get_parser():
+    argparser = ArgumentParser(
         description=
         "Realsense Recorder. Please select one of the optional arguments")
-    parser.add_argument("--output_folder",
-                        default='../dataset/realsense/',
-                        help="set output folder")
-    parser.add_argument("--record_rosbag",
-                        action='store_true',
-                        help="Recording rgbd stream into realsense.bag")
-    parser.add_argument(
-        "--record_imgs",
-        action='store_true',
-        help="Recording save color and depth images into realsense folder")
-    parser.add_argument("--playback_rosbag",
-                        action='store_true',
-                        help="Play recorded realsense.bag file")
+    argparser.add_argument('--color_width', type=int, default=1280, help="color camera width")
+    argparser.add_argument('--color_height', type=int, default=720, help="color camera height")
+    argparser.add_argument('--depth_width', type=int, default=1280, help="depth camera width")
+    argparser.add_argument('--depth_height', type=int, default=720, help="depth camera height")
+    argparser.add_argument('--fps', type=int, default=30, help="input camera fps")
+    argparser.add_argument('--distance', type=float, default=3.0, help="input clipping distance in meters")
+    argparser.add_argument("--output_folder", default='../dataset/', help="set output folder")
+    argparser.add_argument("--record_rosbag", action='store_true', help="Recording rgbd stream into realsense.bag")
+    argparser.add_argument( "--record_imgs", action='store_true', help="Recording save color and depth images into realsense folder")
+    argparser.add_argument("--playback_rosbag", action='store_true', help="Play recorded realsense.bag file")
+
+    return argparser
+
+
+if __name__ == "__main__":
+    parser = get_parser()
     args = parser.parse_args()
 
-    if sum(o is not False for o in vars(args).values()) != 2:
+    if sum(o is not False for o in vars(args).values()) <= 1:
         parser.print_help()
         exit()
 
@@ -101,6 +102,13 @@ if __name__ == "__main__":
             if user_input.lower() == 'n':
                 exit()
 
+    color_camera_width = args.color_width
+    color_camera_height = args.color_height
+    depth_camera_width = args.depth_width
+    depth_camera_height = args.depth_height
+    fps = args.fps
+    distance = args.distance
+
     # Create a pipeline
     pipeline = rs.pipeline()
 
@@ -111,8 +119,8 @@ if __name__ == "__main__":
     if args.record_imgs or args.record_rosbag:
         # note: using 640 x 480 depth resolution produces smooth depth boundaries
         #       using rs.format.bgr8 for color image format for OpenCV based image visualization
-        config.enable_stream(rs.stream.depth, 1280, 720, rs.format.z16, 30)
-        config.enable_stream(rs.stream.color, 640, 480, rs.format.bgr8, 30)
+        config.enable_stream(rs.stream.depth, depth_camera_width, depth_camera_height, rs.format.z16, fps)
+        config.enable_stream(rs.stream.color, color_camera_width, color_camera_height, rs.format.bgr8, fps)
         if args.record_rosbag:
             config.enable_record_to_file(path_bag)
     if args.playback_rosbag:
@@ -131,7 +139,7 @@ if __name__ == "__main__":
 
     # We will not display the background of objects more than
     #  clipping_distance_in_meters meters away
-    clipping_distance_in_meters = 3  # 3 meter
+    clipping_distance_in_meters = distance  # 3 meter
     clipping_distance = clipping_distance_in_meters / depth_scale
 
     # Create an align object

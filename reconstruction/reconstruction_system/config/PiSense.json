@@ -1,7 +1,7 @@
 {
-    "name": "reconstruction using data captured by EtherSenseClient",
+    "name": "reconstruction using data captured by PiSense",
     "path_dataset": "./reconstruction/reconstruction_system/dataset/",
-    "path_intrinsic": "",
+    "path_intrinsic": "./reconstruction/reconstruction_system/dataset/camera_intrinsic.json",
     "max_depth": 3.0,
     "voxel_size": 0.05,
     "max_depth_diff": 0.07,
