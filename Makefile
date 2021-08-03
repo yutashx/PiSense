@@ -11,12 +11,13 @@ PORT=1024
 WINDOW=DISABLE #or ENABLE
 GPU=DISABLE #or ENABLE
 CHUNK_SIZE=4096
-WIDTH=640
-HEIGHT=480
-FPS=6
-DISTANCE=2.0
+WIDTH=1280
+HEIGHT=720
+FPS=30
+DISTANCE=3.0
 MESSAGE=EtherPing
 VIDEO_TYPE=color
+CAPTURE_TYPE=imgs
 
 build_reconstruction:
 	docker build -f ./reconstruction/Dockerfile -t ${TAG_RECONSTRUCTION} ./reconstruction/
@@ -50,12 +51,7 @@ else
 endif
 
 run_capture:
-	capture_type=imgs
-	fps=30
-	height=1280
-	width=720
-	distance=3
-	python3 ./reconstruction/reconstruction_system/sensors/realsense_recorder.py --output_folder=${REFERED_DIRECTORY_PATH} --record_${capture_type} --fps=${fps} --color_width=${width} --color_height=${height} --depth_width=${width} --color_height=${height} --distance=${distance}
+	python3 ./reconstruction/reconstruction_system/sensors/realsense_recorder.py --output_folder=${REFERED_DIRECTORY_PATH} --record_${CAPTURE_TYPE} --fps=${FPS} --color_width=${WIDTH} --color_height=${HEIGHT} --depth_width=${WIDTH} --color_height=${HEIGHT} --distance=${DISTANCE}
 	#python3 ./reconstruction/reconstruction_system/sensors/realsense_recorder.py --output_folder=${REFERED_DIRECTORY_PATH} --record_${capture_type}
 
 
