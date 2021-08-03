@@ -16,6 +16,7 @@ HEIGHT=480
 FPS=6
 DISTANCE=2.0
 MESSAGE=EtherPing
+VIDEO_TYPE=color
 
 build_reconstruction:
 	docker build -f ./reconstruction/Dockerfile -t ${TAG_RECONSTRUCTION} ./reconstruction/
@@ -65,3 +66,12 @@ mkdir_dataset:
 	mkdir -p ${SAVE_DATASET_PATH}
 
 init_directories: mv_dataset mkdir_dataset
+
+make_video:
+ifeq ($(VIDEO_TYPE), color)
+	ffmpeg  -pattern_type glob -i '${REFERED_DIRECTORY_PATH}/color/*.jpg' '${REFERED_DIRECTORY_PATH}/color.mp4'
+else ifeq($(VIDEO_TYPE), depth)
+	ffmpeg  -pattern_type glob -i '${REFERED_DIRECTORY_PATH}/depth/*.png' '${REFERED_DIRECTORY_PATH}/depth.mp4'
+else
+	echo "Nothing happend"
+endif
