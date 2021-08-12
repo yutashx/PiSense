@@ -58,8 +58,6 @@ endif
 
 run_capture:
 	python3 ./reconstruction/reconstruction_system/sensors/realsense_recorder.py --output_folder=${REFERED_DIRECTORY_PATH} --record_${CAPTURE_TYPE} --fps=${FPS} --color_width=${WIDTH} --color_height=${HEIGHT} --depth_width=${WIDTH} --color_height=${HEIGHT} --distance=${DISTANCE}
-	#python3 ./reconstruction/reconstruction_system/sensors/realsense_recorder.py --output_folder=${REFERED_DIRECTORY_PATH} --record_${capture_type}
-
 
 install_server:
 	pip -r ./realsense_server/requirements.txt
