@@ -34,7 +34,7 @@ run_reconstruction:
 		-v ${CURRENT_PATH}:/root/ \
 		-v /etc/group:/etc/group:ro \
 		-v /etc/passwd:/etc/passwd:ro \
-		-u $(id -u $USER):$(id -g $USER) ${TAG_RECONSTRUCTION} bash -c \
+		-u $(shell id -u):$(shell id -g) ${TAG_RECONSTRUCTION} bash -c \
 		'python3 ./reconstruction/reconstruction_system/run_system.py --make --register --refine --integrate --slac --slac_integrate --device cuda:0 ${CONFIG_PATH};'
 
 run_color_optimization:
@@ -42,7 +42,7 @@ run_color_optimization:
 		-v ${CURRENT_PATH}:/root/ \
 		-v /etc/group:/etc/group:ro \
 		-v /etc/passwd:/etc/passwd:ro \
-		-u $(id -u $USER):$(id -g $USER) ${TAG_RECONSTRUCTION} bash -c \
+		-u $(shell id -u):$(shell id -g) ${TAG_RECONSTRUCTION} bash -c \
 		'python3 ./reconstruction/pipelines/color_map_optimization_for_reconstruction_system.py  --config ${CONFIG_PATH};'
 
 run_server:
@@ -82,3 +82,4 @@ endif
 ifeq ($(VIDEO_TYPE), depth)
 	ffmpeg  -pattern_type glob -i '${REFERED_DIRECTORY_PATH}/depth/*.png' '${REFERED_DIRECTORY_PATH}/depth.mp4'
 endif
+
