@@ -18,6 +18,7 @@ DISTANCE=3.0
 MESSAGE=EtherPing
 VIDEO_TYPE=color
 CAPTURE_TYPE=imgs
+GPU_OPTION=
 
 build_reconstruction:
 	docker build -f ./reconstruction/Dockerfile -t ${TAG_RECONSTRUCTION} ./reconstruction/
@@ -29,15 +30,20 @@ build_client:
 	docker build -f ./realsense_client/Dockerfile -t ${TAG_CLIENT} ./realsense_client/
 
 run_reconstruction:
-ifeq ($(GPU), ENABLE)
-	docker run --rm --name ${USER}_pisense_reconstruction --gpus all -v ${CURRENT_PATH}:/root/ -v /etc/group:/etc/group:ro -v /etc/passwd:/etc/passwd:ro -u $(id -u $USER):$(id -g $USER) ${TAG_RECONSTRUCTION} bash -c \
-	'python3 ./reconstruction/reconstruction_system/run_system.py --make --register --refine --integrate ${CONFIG_PATH}; \
-	python3 ./reconstruction/pipelines/color_map_optimization_for_reconstruction_system.py  --config ${CONFIG_PATH};'
-else
-	docker run --rm --name ${USER}_pisense_reconstruction -v ${CURRENT_PATH}:/root/ -v /etc/group:/etc/group:ro -v /etc/passwd:/etc/passwd:ro -u $(id -u $USER):$(id -g $USER) ${TAG_RECONSTRUCTION} bash -c \
-	'python3 ./reconstruction/reconstruction_system/run_system.py --make --register --refine --integrate ${CONFIG_PATH}; \
-	python3 ./reconstruction/pipelines/color_map_optimization_for_reconstruction_system.py  --config ${CONFIG_PATH};'
-endif
+	docker run --rm --name ${USER}_pisense_reconstruction ${GPU_OPTION} \
+		-v ${CURRENT_PATH}:/root/ \
+		-v /etc/group:/etc/group:ro \
+		-v /etc/passwd:/etc/passwd:ro \
+		-u $(id -u $USER):$(id -g $USER) ${TAG_RECONSTRUCTION} bash -c \
+		'python3 ./reconstruction/reconstruction_system/run_system.py --make --register --refine --integrate --slac --slac_integrate --device cuda:0 ${CONFIG_PATH};'
+
+run_color_optimization:
+	docker run --rm --name ${USER}_pisense_reconstruction ${GPU_OPTION} \
+		-v ${CURRENT_PATH}:/root/ \
+		-v /etc/group:/etc/group:ro \
+		-v /etc/passwd:/etc/passwd:ro \
+		-u $(id -u $USER):$(id -g $USER) ${TAG_RECONSTRUCTION} bash -c \
+		'python3 ./reconstruction/pipelines/color_map_optimization_for_reconstruction_system.py  --config ${CONFIG_PATH};'
 
 run_server:
 	python3 ./realsense_server/EtherSenseServer.py --port=${PORT} --chunk_size=${CHUNK_SIZE} --width=${WIDTH} --height=${HEIGHT} --fps=${FPS} --distance=${DISTANCE}
