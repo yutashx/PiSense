@@ -9,3 +9,4 @@ tmp
 *.pyc
 save_dataset
 .bash_history
+venv/
