@@ -10,3 +10,4 @@ tmp
 save_dataset
 .bash_history
 venv/
+reconstruction/reconstruction_system/config/

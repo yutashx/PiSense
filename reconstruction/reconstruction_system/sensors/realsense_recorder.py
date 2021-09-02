@@ -75,6 +75,7 @@ def get_parser():
     argparser.add_argument("--record_rosbag", action='store_true', help="Recording rgbd stream into realsense.bag")
     argparser.add_argument( "--record_imgs", action='store_true', help="Recording save color and depth images into realsense folder")
     argparser.add_argument("--playback_rosbag", action='store_true', help="Play recorded realsense.bag file")
+    argparser.add_argument("--window", action='store_true', help="visualize capturing color and dpeth images")
 
     return argparser
 
@@ -189,16 +190,17 @@ if __name__ == "__main__":
                     (depth_image_3d <= 0), grey_color, color_image)
 
             # Render images
-            depth_colormap = cv2.applyColorMap(
-                cv2.convertScaleAbs(depth_image, alpha=0.09), cv2.COLORMAP_JET)
-            images = np.hstack((bg_removed, depth_colormap))
-            cv2.namedWindow('Recorder Realsense', cv2.WINDOW_AUTOSIZE)
-            cv2.imshow('Recorder Realsense', images)
-            key = cv2.waitKey(1)
+            if args.window:
+                depth_colormap = cv2.applyColorMap(
+                    cv2.convertScaleAbs(depth_image, alpha=0.09), cv2.COLORMAP_JET)
+                images = np.hstack((bg_removed, depth_colormap))
+                cv2.namedWindow('Recorder Realsense', cv2.WINDOW_AUTOSIZE)
+                cv2.imshow('Recorder Realsense', images)
+                key = cv2.waitKey(1)
 
-            # if 'esc' button pressed, escape loop and exit program
-            if key == 27:
-                cv2.destroyAllWindows()
-                break
+                # if 'esc' button pressed, escape loop and exit program
+                if key == 27:
+                    cv2.destroyAllWindows()
+                    break
     finally:
         pipeline.stop()

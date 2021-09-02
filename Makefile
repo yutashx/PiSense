@@ -35,7 +35,7 @@ run_reconstruction:
 		-v /etc/group:/etc/group:ro \
 		-v /etc/passwd:/etc/passwd:ro \
 		-u $(shell id -u):$(shell id -g) ${TAG_RECONSTRUCTION} bash -c \
-		'python3 ./reconstruction/reconstruction_system/run_system.py --make --register --refine --integrate --slac --slac_integrate --device cuda:0 ${CONFIG_PATH};'
+		'python3 ./reconstruction/reconstruction_system/run_system.py --make --register --refine --integrate ${CONFIG_PATH};'
 
 run_color_optimization:
 	docker run --rm --name ${USER}_pisense_reconstruction ${GPU_OPTION} \
